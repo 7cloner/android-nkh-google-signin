@@ -38,37 +38,41 @@ class NKHGoogleSignin(
     }
 
     private fun handleSignIn(result: GetCredentialResponse) {
-        val credential = result.credential
-        when (credential) {
-            is CustomCredential -> {
-                if (credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
-                    try {
-                        val googleIdTokenCredential =
-                            GoogleIdTokenCredential.createFrom(credential.data)
+        try {
+            val credential = result.credential
+            when (credential) {
+                is CustomCredential -> {
+                    if (credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+                        try {
+                            val googleIdTokenCredential =
+                                GoogleIdTokenCredential.createFrom(credential.data)
 
-                        listener.onSignInCompleted()
-                        listener.onUserSigned(
-                            GoogleUser(
-                                displayName = googleIdTokenCredential.displayName,
-                                familyName = googleIdTokenCredential.familyName,
-                                givenName = googleIdTokenCredential.givenName,
-                                id = googleIdTokenCredential.id,
-                                idToken = googleIdTokenCredential.idToken,
-                                phoneNumber = googleIdTokenCredential.phoneNumber,
-                                profilePictureUri = googleIdTokenCredential.profilePictureUri.toString()
+                            listener.onSignInCompleted()
+                            listener.onUserSigned(
+                                GoogleUser(
+                                    displayName = googleIdTokenCredential.displayName,
+                                    familyName = googleIdTokenCredential.familyName,
+                                    givenName = googleIdTokenCredential.givenName,
+                                    id = googleIdTokenCredential.id,
+                                    idToken = googleIdTokenCredential.idToken,
+                                    phoneNumber = googleIdTokenCredential.phoneNumber,
+                                    profilePictureUri = googleIdTokenCredential.profilePictureUri.toString()
+                                )
                             )
-                        )
-                    } catch (e: GoogleIdTokenParsingException) {
-                        listener.onSignInFailed(e.message.toString())
+                        } catch (e: GoogleIdTokenParsingException) {
+                            listener.onSignInFailed(e.message.toString())
+                        }
+                    } else {
+                        listener.onSignInFailed("Unexpected type of credential")
                     }
-                } else {
+                }
+
+                else -> {
                     listener.onSignInFailed("Unexpected type of credential")
                 }
             }
-
-            else -> {
-                listener.onSignInFailed("Unexpected type of credential")
-            }
+        }catch (ee: Exception){
+            listener.onSignInFailed(ee.message.toString())
         }
     }
 }
