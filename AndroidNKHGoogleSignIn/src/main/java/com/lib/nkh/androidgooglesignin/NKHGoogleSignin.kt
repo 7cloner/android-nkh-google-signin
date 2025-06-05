@@ -25,7 +25,7 @@ class NKHGoogleSignin(
                         val result = credentialManager.getCredential(context, getCredentialRequest)
                         listener.onSignInPageOpened()
                         handleSignIn(result)
-                    } catch (e: NoCredentialException) {
+                    } catch (e: Exception) {
                         listener.onSignInFailed(e.message.toString())
                     }
                 }
